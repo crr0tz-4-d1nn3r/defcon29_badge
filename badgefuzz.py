@@ -23,7 +23,7 @@ sigReg = re.compile('.*Shared the Signal: (\d+)')
 # wrapper for serial write
 def serialWrite(s, msg):
     s.write(msg.encode())
-    sleep(1)
+    sleep(0.2)
     s.flush()
     
 # wrapper for serial read
@@ -66,8 +66,9 @@ if __name__ == '__main__':
             
             # Get menu - this can take some time.
             if state == 0:
-                # imenu reguarly fails to show without prompting
-                # this hack is safe enough
+                # menu reguarly fails to show without prompting
+                # this hack is safe enough.
+                # script will work without getting menu, just a nice-to-have
                 serialWrite(s, '\r\n') 
                 resp = serialRead(s)
                 print(resp)
