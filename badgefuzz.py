@@ -4,12 +4,17 @@ DC29 Human Badge Fuzzer
 Used to help level up badges and get to the next part of the puzzle
 
 To run:
-    plug in the badge, make sure in USB mode. Then from command, run:
-    sudo chmod a+rw /dev/ttyACM0
-    python3 badgefuzz.py
+    plug in the badge, make sure in USB mode. 
+    Find the serial port the badge is attached to run:
+        dmesg | grep tty
+    Make sure your user can access port:
+        sudo chmod a+rw /dev/ttyACM0
+    Run program with:
+        python3 badgefuzz.py - /dev/ttyACM[??] -n [number of max signals]
 
 """
 
+import argparse
 from serial import Serial 
 import random
 from time import sleep
@@ -23,7 +28,7 @@ sigReg = re.compile('.*Shared the Signal: (\d+)')
 # wrapper for serial write
 def serialWrite(s, msg):
     s.write(msg.encode())
-    sleep(0.2)
+    sleep(0.1)
     s.flush()
     
 # wrapper for serial read
@@ -58,11 +63,17 @@ def makeResponse(request):
 
 
 if __name__ == '__main__':
-    with Serial('/dev/ttyACM0',115200, timeout=5) as s:
+    # command line arguments accepted
+    parser = argparse.ArgumentParser(description='fuzz the DC29 badge')
+    parser.add_argument('-s', action='store', dest='ttyport', type=str, default='/dev/ttyACM0', help='serial port')
+    parser.add_argument('-n', action='store', dest='numSignals', type=int, default=20, help='number of max signals')
+    args = parser.parse_args()
+
+    with Serial(args.ttyport, 115200, timeout=5) as s:
         sleep(1)
         state = 0
         signalCount = 0
-        while signalCount < 20:
+        while signalCount < args.numSignals:
             
             # Get menu - this can take some time.
             if state == 0:
@@ -75,11 +86,12 @@ if __name__ == '__main__':
                 match = sigReg.search(resp)
                 if match:
                     signalCount = int(match[1])
-                    if signalCount > 20:
+                    if signalCount > args.numSignals:
                         break
                 state = 1
             
-            # Get request string
+            # Get request string 
+            # only need to run this once
             if state == 1:
                 serialWrite(s,'4')
                 resp = serialRead(s)
@@ -100,4 +112,4 @@ if __name__ == '__main__':
                 match = sigReg.search(resp)
                 if match:
                     signalCount = int(match[1])
-                state = 1
+                state = 2
