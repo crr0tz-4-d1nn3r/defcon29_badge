@@ -24,7 +24,21 @@ BA 8D AF17 22 680564 EAD812 DF7E9EE165
 
 Used this to help generate the badgefuzz.py code. This script will level up the badge (phase0=get all badge types) and "share the signal" (pase1=share signal 20 times).
 
-TODO - there is likely a pattern to generate the codes for the different badge types. I think somene already got that? Would be cool to do some experimenting to get that sus'd out.
+### Script
+[badgefuzz.py](badgefuzz.py)
+
+Python3 script. Uses the PySerial Library ([https://pythonhosted.org/pyserial/](https://pythonhosted.org/pyserial/)) to control serial coms. May need to install. 
+
+Command line interface with two arguments:
+
+1. serial port for the badge, default is /dev/ttyACM0
+2. Max number of signals to share after badge is leveled up, default is 20
+
+Started writing the script with the state machine pattern  - thinking things might get complicated. Turns out, it's not really that complicated, so the state machine is a bit overkill. 
+
+
+### TODO
+there is likely a pattern to generate the codes for the different badge types. I think somene already got that? Would be cool to do some experimenting to get that sus'd out.
 
 
 ## Firmware
@@ -76,5 +90,6 @@ FLOW: Contains the WATERMARK address and the AUTOSTOP and AUTOHALT control bits,
 BASE: Indicates where the SRAM is located in the processor memory map. This register is provided to enable
 auto-discovery of the MTB SRAM location, by a debug agent.
 See the CoreSight MTB-M0+ Technical Reference Manual for a detailed description of these registers.
-
 ```
+
+Work in progress ...
